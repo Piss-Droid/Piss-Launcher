@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.pissdroid.pisslauncher"
-          android:versionCode="1"
-          android:versionName="Big Chicken">
+          package="com.pissdroid.pisslauncher">
 
     <application
             android:allowBackup="true"

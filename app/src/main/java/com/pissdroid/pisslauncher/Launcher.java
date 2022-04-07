@@ -29,7 +29,7 @@ public class Launcher extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
 
-        layout = (ViewGroup) findViewById(R.id.activity_launcher);
+        layout = findViewById(R.id.activity_launcher);
         billy = AppWidgetManager.getInstance(this);
         bob = new AppWidgetHost(this, R.id.BOB_ID);
         gestureDetector = new GestureDetector(this, new GestureListener());
@@ -41,15 +41,12 @@ public class Launcher extends AppCompatActivity {
         Intent pickIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
         pickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, bob_Id);
         addEmptyData(pickIntent);
-        //startActivityForResult(pickIntent, R.id.PICK_WIDGET);
         meGustaface.launch(pickIntent);
     }
 
     void addEmptyData(Intent pickIntent) {
-        ArrayList customInfo = new ArrayList();
-        pickIntent.putParcelableArrayListExtra(AppWidgetManager.EXTRA_CUSTOM_INFO, customInfo);
-        ArrayList customExtras = new ArrayList();
-        pickIntent.putParcelableArrayListExtra(AppWidgetManager.EXTRA_CUSTOM_EXTRAS, customExtras);
+        pickIntent.putParcelableArrayListExtra(AppWidgetManager.EXTRA_CUSTOM_INFO, new ArrayList<>());
+        pickIntent.putParcelableArrayListExtra(AppWidgetManager.EXTRA_CUSTOM_EXTRAS, new ArrayList<>());
     };
 
     ActivityResultLauncher<Intent> meGustaface = registerForActivityResult(
@@ -69,7 +66,6 @@ public class Launcher extends AppCompatActivity {
                     }
                 }
             });
-
 
                 private void configstuff(Intent stuff) {
                     int appWidgetId = stuff.getExtras().getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
@@ -91,40 +87,6 @@ public class Launcher extends AppCompatActivity {
                     hostView.setAppWidget(appWidgetId, appWidgetInfo);
                     layout.addView(hostView);
                 }
-    // Why did you do this to me Mr. Google?
-   /* @Override
-    protected void onActivityResult(int request, int result, Intent stuff) {
-        super.onActivityResult(request, result, stuff);
-        switch (result) {
-            case RESULT_OK:
-                switch (request) {
-                    case R.id.PICK_WIDGET:
-                        configstuff(stuff, request);
-                    case R.id.CREATE_WIDGET:
-                        makething(stuff);
-                }
-            case RESULT_CANCELED:
-                if (stuff != null) {
-                    int appWidgetId = stuff.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
-                    if (appWidgetId != -1) bob.deleteAppWidgetId(appWidgetId);
-                }
-        }
-    }
-
-    //Checks for config stuff for the widget
-    private void configstuff(Intent stuff, int request) {
-        int appWidgetId = stuff.getExtras().getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
-        AppWidgetProviderInfo appWidgetInfo = billy.getAppWidgetInfo(appWidgetId);
-        if (appWidgetInfo.configure != null) {
-            Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
-                .setComponent(appWidgetInfo.configure)
-                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-            startActivityForResult(intent, request);
-        } else {
-            makething(stuff);
-        }
-    } */
-
 
     ActivityResultLauncher<Intent> leTrollface = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -134,6 +96,7 @@ public class Launcher extends AppCompatActivity {
                     Intent stuff = result.getData();
                     switch (result.getResultCode()) {
                         case RESULT_OK:
+                            assert stuff != null;
                             makething(stuff);
                         case RESULT_CANCELED:
                             if (stuff != null) {

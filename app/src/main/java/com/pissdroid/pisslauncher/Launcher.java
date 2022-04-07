@@ -4,6 +4,10 @@ import android.appwidget.AppWidgetHostView;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.Intent;
 import android.view.*;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.appwidget.AppWidgetManager;
@@ -37,7 +41,8 @@ public class Launcher extends AppCompatActivity {
         Intent pickIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
         pickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, bob_Id);
         addEmptyData(pickIntent);
-        startActivityForResult(pickIntent, R.id.PICK_WIDGET);
+        //startActivityForResult(pickIntent, R.id.PICK_WIDGET);
+        meGustaface.launch(pickIntent);
     }
 
     void addEmptyData(Intent pickIntent) {
@@ -47,44 +52,97 @@ public class Launcher extends AppCompatActivity {
         pickIntent.putParcelableArrayListExtra(AppWidgetManager.EXTRA_CUSTOM_EXTRAS, customExtras);
     };
 
-    @Override
+    ActivityResultLauncher<Intent> meGustaface = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    Intent stuff = result.getData();
+                    switch (result.getResultCode()) {
+                        case RESULT_OK:
+                            configstuff(stuff);
+                        case RESULT_CANCELED:
+                            if (stuff != null) {
+                                int appWidgetId = stuff.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+                                if (appWidgetId != -1) bob.deleteAppWidgetId(appWidgetId);
+                            }
+                    }
+                }
+            });
+
+
+                private void configstuff(Intent stuff) {
+                    int appWidgetId = stuff.getExtras().getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+                    AppWidgetProviderInfo appWidgetInfo = billy.getAppWidgetInfo(appWidgetId);
+                    if (appWidgetInfo.configure != null) {
+                        Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
+                                .setComponent(appWidgetInfo.configure)
+                                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, R.id.PICK_WIDGET);
+                        leTrollface.launch(intent);
+                    } else {
+                        makething(stuff);
+                    }
+                }
+
+                private void makething(Intent stuff) {
+                    int appWidgetId = stuff.getExtras().getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+                    AppWidgetProviderInfo appWidgetInfo = billy.getAppWidgetInfo(appWidgetId);
+                    AppWidgetHostView hostView = bob.createView(this, appWidgetId, appWidgetInfo);
+                    hostView.setAppWidget(appWidgetId, appWidgetInfo);
+                    layout.addView(hostView);
+                }
+    // Why did you do this to me Mr. Google?
+   /* @Override
     protected void onActivityResult(int request, int result, Intent stuff) {
         super.onActivityResult(request, result, stuff);
-        if (result == RESULT_OK && (request == R.id.PICK_WIDGET)) { // TODO Change this to a switch case later maybe. :)
-            configstuff(stuff);
-        }
-        if (result == RESULT_OK && (request == R.id.CREATE_WIDGET)) {
-            makething(stuff);
-        }
-        if (result == RESULT_CANCELED && stuff != null) {
-            int appWidgetId = stuff.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
-            if (appWidgetId != -1) {
-                bob.deleteAppWidgetId(appWidgetId);
-            }
+        switch (result) {
+            case RESULT_OK:
+                switch (request) {
+                    case R.id.PICK_WIDGET:
+                        configstuff(stuff, request);
+                    case R.id.CREATE_WIDGET:
+                        makething(stuff);
+                }
+            case RESULT_CANCELED:
+                if (stuff != null) {
+                    int appWidgetId = stuff.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+                    if (appWidgetId != -1) bob.deleteAppWidgetId(appWidgetId);
+                }
         }
     }
 
     //Checks for config stuff for the widget
-    private void configstuff(Intent stuff) {
+    private void configstuff(Intent stuff, int request) {
         int appWidgetId = stuff.getExtras().getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
         AppWidgetProviderInfo appWidgetInfo = billy.getAppWidgetInfo(appWidgetId);
         if (appWidgetInfo.configure != null) {
-            Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE);
-            intent.setComponent(appWidgetInfo.configure);
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-            startActivityForResult(intent, R.id.CREATE_WIDGET);
+            Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
+                .setComponent(appWidgetInfo.configure)
+                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+            startActivityForResult(intent, request);
         } else {
             makething(stuff);
         }
-    }
+    } */
 
-    private void makething(Intent stuff) {
-        int appWidgetId = stuff.getExtras().getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
-        AppWidgetProviderInfo appWidgetInfo = billy.getAppWidgetInfo(appWidgetId);
-        AppWidgetHostView hostView = bob.createView(this, appWidgetId, appWidgetInfo);
-        hostView.setAppWidget(appWidgetId, appWidgetInfo);
-        layout.addView(hostView);
-    }
+
+    ActivityResultLauncher<Intent> leTrollface = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    Intent stuff = result.getData();
+                    switch (result.getResultCode()) {
+                        case RESULT_OK:
+                            makething(stuff);
+                        case RESULT_CANCELED:
+                            if (stuff != null) {
+                                int appWidgetId = stuff.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+                                if (appWidgetId != -1) bob.deleteAppWidgetId(appWidgetId);
+                            }
+                    }
+                }
+            });
 
     public void removeWidget(AppWidgetHostView hostView) {
         bob.deleteAppWidgetId(hostView.getAppWidgetId());

@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Piss Launcher</string>
     <string name="i_love_tux"><![CDATA[I LOVE TUX <3]]></string>
+    <string name="wallpapers">Wallpapers</string>
+    <string name="widgets">Widgets</string>
+    <string name="settings">Settings</string>
 </resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="BOB_ID" type="id"/>
+    <item name="CREATE_WIDGET" type="id"/>
+    <item name="PICK_WIDGET" type="id"/>
+</resources>
